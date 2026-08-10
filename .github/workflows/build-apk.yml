@@ -30,8 +30,12 @@ jobs:
     - name: Build Web Assets
       run: npm run build --if-present
 
+    # --- INI BARIS BARU UNTUK MEMPERBAIKI PERMISSION ---
+    - name: Fix Capacitor Permissions
+      run: chmod +x node_modules/.bin/cap
+
     - name: Sync Capacitor
-      run: npx cap sync android --if-present
+      run: npx cap sync android
 
     - name: Make Gradlew Executable
       run: chmod +x android/gradlew
