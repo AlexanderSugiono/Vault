@@ -1,0 +1,8 @@
+{
+  "appId": "com.vaulty.app",
+  "appName": "Vaulty",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

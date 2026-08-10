@@ -1,0 +1,8 @@
+/* Vaulty - Local font (Plus Jakarta Sans variable, latin subset) */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/plus-jakarta-sans.woff2") format("woff2");
+}

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#6d28d9" />
+  <title>Vaulty - Personal Finance</title>
+
+  <!-- Local Fonts (Plus Jakarta Sans) -->
+  <link rel="stylesheet" href="fonts.css" />
+
+  <!-- Local FontAwesome (offline) -->
+  <link rel="stylesheet" href="fa-all.min.css" />
+
+  <!-- Local Tailwind-compatible utilities (offline) -->
+  <link rel="stylesheet" href="tailwind.local.css" />
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="min-h-screen text-white">
+  <!-- Floating glass blobs background -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+
+  <!-- App Container -->
+  <main class="relative mx-auto min-h-screen max-w-md px-5 pb-32 pt-6">
+
+    <!-- ==================== VIEW: HOME ==================== -->
+    <div id="view-home" class="tab-view">
+      <!-- ===== HEADER ===== -->
+      <header class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="glass-icon">
+            <i class="fa-solid fa-vault text-lg"></i>
+          </span>
+          <div>
+            <h1 class="text-2xl font-extrabold tracking-tight">Vaulty</h1>
+            <p id="currentDate" class="mt-0.5 text-xs font-medium text-white/60"></p>
+          </div>
+        </div>
+      </header>
+
+      <!-- ===== TOTAL SALDO CARD ===== -->
+      <section class="glass-card mt-6 p-6">
+        <p class="text-xs font-medium uppercase tracking-widest text-white/60">Total Saldo</p>
+        <p class="mt-2 text-4xl font-extrabold tracking-tight">Rp <span id="totalBalance">0</span></p>
+
+        <div class="mt-5 flex gap-3">
+          <div class="glass-chip flex-1">
+            <div class="flex items-center gap-2 text-emerald-300">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <span class="text-xs font-semibold">Pemasukan</span>
+            </div>
+            <p class="mt-1 text-lg font-bold">+Rp <span id="totalIncome">0</span></p>
+          </div>
+          <div class="glass-chip flex-1">
+            <div class="flex items-center gap-2 text-rose-300">
+              <i class="fa-solid fa-arrow-trend-down"></i>
+              <span class="text-xs font-semibold">Pengeluaran</span>
+            </div>
+            <p class="mt-1 text-lg font-bold">-Rp <span id="totalExpense">0</span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== QUICK ACTIONS ===== -->
+      <section class="mt-6 grid grid-cols-2 gap-3">
+        <button id="btnAddTransaction" class="glass-btn-cta">
+          <span class="glass-icon-sm"><i class="fa-solid fa-plus"></i></span>
+          <span class="flex flex-col items-start">
+            <span class="text-sm font-bold">Tambah Transaksi</span>
+            <span class="text-xs text-white/50">Catat pemasukan / pengeluaran</span>
+          </span>
+        </button>
+        <button id="btnAddCategory" class="glass-btn-cta">
+          <span class="glass-icon-sm"><i class="fa-solid fa-layer-group"></i></span>
+          <span class="flex flex-col items-start">
+            <span class="text-sm font-bold">Tambah Kategori</span>
+            <span class="text-xs text-white/50">Kelola kategori keuangan</span>
+          </span>
+        </button>
+      </section>
+
+      <!-- ===== RECENT TRANSACTIONS ===== -->
+      <section class="mt-8">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold">Transaksi Terakhir</h2>
+          <button id="btnSeeAll" class="see-all-btn" type="button">Lihat Semua</button>
+        </div>
+
+        <!-- List rendered by app.js -->
+        <div id="homeTransactionList" class="mt-4 space-y-3"></div>
+      </section>
+    </div>
+
+    <!-- ==================== VIEW: TRANSAKSI ==================== -->
+    <div id="view-transactions" class="tab-view hidden">
+      <div class="flex items-center gap-3">
+        <span class="glass-icon"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
+        <h1 class="text-2xl font-extrabold tracking-tight">Transaksi</h1>
+      </div>
+      <p class="mt-1 text-xs text-white/50">Seluruh catatan pemasukan & pengeluaran</p>
+
+      <!-- ===== SEARCH & FILTER BAR ===== -->
+      <div class="mt-5 space-y-3">
+        <div class="input-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            id="searchInput"
+            class="glass-input"
+            placeholder="Cari transaksi..."
+            autocomplete="off"
+          />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="input-wrap">
+            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+            <select id="filterType" class="glass-input">
+              <option value="all">Semua Jenis</option>
+              <option value="income">Pemasukan</option>
+              <option value="expense">Pengeluaran</option>
+            </select>
+          </div>
+          <div class="input-wrap">
+            <i class="fa-solid fa-layer-group"></i>
+            <select id="filterCategory" class="glass-input">
+              <option value="all">Semua Kategori</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- List rendered by app.js -->
+      <div id="transactionList" class="mt-4 space-y-3"></div>
+    </div>
+
+    <!-- ==================== VIEW: LAPORAN ==================== -->
+    <div id="view-reports" class="tab-view hidden">
+      <div class="flex items-center gap-3">
+        <span class="glass-icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <h1 class="text-2xl font-extrabold tracking-tight">Laporan</h1>
+      </div>
+      <p id="reportPeriod" class="mt-1 text-xs text-white/50"></p>
+
+      <!-- ===== REKAP BULAN INI ===== -->
+      <div class="glass-card mt-5">
+        <p class="label">Rekap Bulan Ini</p>
+        <div class="mt-4 grid grid-cols-3 gap-3">
+          <div class="text-center">
+            <p class="text-xs text-white/50">Masuk</p>
+            <p class="mt-1 text-sm font-bold text-emerald-300">+Rp <span id="monthIncome">0</span></p>
+          </div>
+          <div class="text-center">
+            <p class="text-xs text-white/50">Keluar</p>
+            <p class="mt-1 text-sm font-bold text-rose-300">-Rp <span id="monthExpense">0</span></p>
+          </div>
+          <div class="text-center">
+            <p class="text-xs text-white/50">Selisih</p>
+            <p class="mt-1 text-sm font-bold">Rp <span id="monthBalance">0</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== GRAFIK PENGELUARAN ===== -->
+      <div class="glass-card mt-4">
+        <p class="label">Pengeluaran per Kategori</p>
+        <div class="chart-wrap mt-3">
+          <canvas id="expenseChart"></canvas>
+          <p id="chartEmpty" class="chart-empty">Belum ada data pengeluaran bulan ini</p>
+        </div>
+        <div id="categoryBreakdown" class="mt-4 space-y-3"></div>
+      </div>
+
+      <!-- ===== RINGKASAN ===== -->
+      <div class="glass-card mt-4">
+        <p class="label">Ringkasan</p>
+        <div class="mt-3 space-y-2 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Rata-rata Pengeluaran Harian</span>
+            <span id="avgDaily" class="font-bold">Rp 0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Kategori Terbesar</span>
+            <span id="topCategory" class="font-bold text-right">-</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Jumlah Transaksi</span>
+            <span id="txCount" class="font-bold">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: PENGATURAN ==================== -->
+    <div id="view-settings" class="tab-view hidden">
+      <div class="flex items-center gap-3">
+        <span class="glass-icon"><i class="fa-solid fa-gear"></i></span>
+        <h1 class="text-2xl font-extrabold tracking-tight">Pengaturan</h1>
+      </div>
+
+      <!-- ===== TENTANG APLIKASI ===== -->
+      <div class="glass-card mt-5">
+        <p class="label">Tentang Aplikasi</p>
+        <div class="mt-3 space-y-2 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Nama</span>
+            <span class="font-bold">Vaulty</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Versi</span>
+            <span class="font-bold">1.0.0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Deskripsi</span>
+            <span class="font-bold">Personal Finance</span>
+          </div>
+        </div>
+        <p class="mt-3 text-xs leading-relaxed text-white/50">
+          Aplikasi pencatatan keuangan pribadi dengan gaya Glassmorphism.
+          Seluruh data tersimpan aman di perangkat Anda (LocalStorage).
+        </p>
+      </div>
+
+      <!-- ===== STATUS DATA ===== -->
+      <div class="glass-card mt-4">
+        <p class="label">Status Data</p>
+        <div class="mt-3 space-y-2 text-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Jumlah Transaksi</span>
+            <span id="statTx" class="font-bold">0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Jumlah Kategori</span>
+            <span id="statCat" class="font-bold">0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white/60">Penyimpanan</span>
+            <span id="statStorage" class="font-bold">LocalStorage</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TEMA TAMPILAN ===== -->
+      <div class="glass-card mt-4">
+        <p class="label">Tema Tampilan</p>
+        <p class="mt-2 text-xs leading-relaxed text-white/55">Pilih suasana warna aplikasi sesuai keinginan Anda.</p>
+        <div class="theme-grid mt-4">
+          <button type="button" class="theme-option" data-theme-value="magenta">
+            <span class="theme-swatch magenta"></span>
+            <span class="theme-name">Magenta</span>
+            <span class="theme-desc">Ungu & Pink</span>
+          </button>
+          <button type="button" class="theme-option" data-theme-value="emerald">
+            <span class="theme-swatch emerald"></span>
+            <span class="theme-name">Emerald</span>
+            <span class="theme-desc">Teal Sejuk</span>
+          </button>
+          <button type="button" class="theme-option" data-theme-value="navy">
+            <span class="theme-swatch navy"></span>
+            <span class="theme-name">Navy</span>
+            <span class="theme-desc">Dark Tenang</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== CADANGAN & PEMULIHAN DATA ===== -->
+      <div class="glass-card mt-4">
+        <p class="label">Cadangan & Pemulihan Data</p>
+        <p class="mt-2 text-xs leading-relaxed text-white/55">
+          Ekspor seluruh data ke file JSON, atau impor kembali file backup untuk memulihkan data.
+        </p>
+        <div class="mt-4 flex flex-col gap-3">
+          <button id="btnExportData" class="modal-btn save w-full">
+            <i class="fa-solid fa-download"></i> Ekspor Data (JSON)
+          </button>
+          <button id="btnImportData" class="import-btn w-full">
+            <i class="fa-solid fa-upload"></i> Impor Data (JSON)
+          </button>
+          <input type="file" id="importFileInput" accept=".json,application/json" class="hidden" />
+        </div>
+      </div>
+
+      <!-- ===== ZONA BERBAHAYA ===== -->
+      <div class="glass-card mt-4 danger-zone">
+        <p class="label text-rose-300">Zona Berbahaya</p>
+        <p class="mt-2 text-xs leading-relaxed text-white/55">
+          Hapus seluruh data transaksi & kategori. Tindakan ini tidak dapat dibatalkan.
+        </p>
+        <button id="btnResetData" class="reset-btn mt-4 w-full">
+          <i class="fa-solid fa-trash-can"></i> Hapus Semua Data
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <nav class="bottom-nav glass-nav">
+      <button class="nav-item active" data-page="home">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-page="transactions">
+        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+        <span>Transaksi</span>
+      </button>
+      <button id="btnFloatingAdd" class="nav-fab" aria-label="Tambah Transaksi">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+      <button class="nav-item" data-page="reports">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Laporan</span>
+      </button>
+      <button class="nav-item" data-page="settings">
+        <i class="fa-solid fa-gear"></i>
+        <span>Pengaturan</span>
+      </button>
+    </nav>
+  </main>
+
+  <!-- ===== MODAL TAMBAH TRANSAKSI ===== -->
+  <div id="txModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="txModalTitle">
+    <div class="modal glass-modal">
+      <div class="flex items-center justify-between">
+        <h2 id="txModalTitle" class="text-lg font-bold">Tambah Transaksi</h2>
+        <button id="btnCloseModal" class="glass-btn" aria-label="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="txForm" novalidate>
+        <!-- Jenis Transaksi -->
+        <div class="mt-5">
+          <label class="form-label">Jenis Transaksi</label>
+          <div class="type-toggle">
+            <button type="button" class="type-btn income active" data-type="income">
+              <i class="fa-solid fa-arrow-trend-up"></i> Pemasukan
+            </button>
+            <button type="button" class="type-btn expense" data-type="expense">
+              <i class="fa-solid fa-arrow-trend-down"></i> Pengeluaran
+            </button>
+          </div>
+        </div>
+
+        <!-- Nominal -->
+        <div class="mt-4">
+          <label for="txAmount" class="form-label">Nominal (Rp)</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-coins"></i>
+            <input type="number" id="txAmount" class="glass-input" placeholder="0" min="1" step="1" required />
+          </div>
+          <p id="amountError" class="form-error hidden">Nominal wajib diisi dan harus lebih dari 0.</p>
+        </div>
+
+        <!-- Kategori -->
+        <div class="mt-4">
+          <label for="txCategory" class="form-label">Kategori</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-layer-group"></i>
+            <select id="txCategory" class="glass-input"></select>
+          </div>
+        </div>
+
+        <!-- Tanggal -->
+        <div class="mt-4">
+          <label for="txDate" class="form-label">Tanggal</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-calendar-days"></i>
+            <input type="date" id="txDate" class="glass-input" required />
+          </div>
+          <p id="dateError" class="form-error hidden">Tanggal wajib diisi.</p>
+        </div>
+
+        <!-- Catatan -->
+        <div class="mt-4">
+          <label for="txNote" class="form-label">Catatan (opsional)</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-note-sticky"></i>
+            <input type="text" id="txNote" class="glass-input" placeholder="e.g. Makan siang di kantor" />
+          </div>
+        </div>
+
+        <div class="mt-6 flex gap-3">
+          <button type="button" id="btnCancelModal" class="modal-btn cancel flex-1">Batal</button>
+          <button type="submit" id="txSubmitBtn" class="modal-btn save flex-1">Simpan Transaksi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL TAMBAH KATEGORI ===== -->
+  <div id="catModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="catModalTitle">
+    <div class="modal glass-modal">
+      <div class="flex items-center justify-between">
+        <h2 id="catModalTitle" class="text-lg font-bold">Tambah Kategori Baru</h2>
+        <button id="btnCloseCatModal" class="glass-btn" aria-label="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="catForm" novalidate>
+        <!-- Nama Kategori -->
+        <div class="mt-5">
+          <label for="catName" class="form-label">Nama Kategori</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-tag"></i>
+            <input type="text" id="catName" class="glass-input" placeholder="e.g. Gaji Sampingan" maxlength="30" required />
+          </div>
+          <p id="catNameError" class="form-error hidden">Nama kategori wajib diisi.</p>
+        </div>
+
+        <!-- Jenis Kategori -->
+        <div class="mt-4">
+          <label class="form-label">Jenis Kategori</label>
+          <div class="type-toggle">
+            <button type="button" class="type-btn cat-type income active" data-cattype="income">
+              <i class="fa-solid fa-arrow-trend-up"></i> Pemasukan
+            </button>
+            <button type="button" class="type-btn cat-type expense" data-cattype="expense">
+              <i class="fa-solid fa-arrow-trend-down"></i> Pengeluaran
+            </button>
+            <button type="button" class="type-btn cat-type both" data-cattype="both">
+              <i class="fa-solid fa-right-left"></i> Dua-duanya
+            </button>
+          </div>
+        </div>
+
+        <!-- Pilihan Ikon -->
+        <div class="mt-4">
+          <label class="form-label">Pilih Ikon</label>
+          <div id="iconPicker" class="icon-picker"></div>
+          <input type="hidden" id="catIcon" value="fa-solid fa-tag" />
+        </div>
+
+        <div class="mt-6 flex gap-3">
+          <button type="button" id="btnCancelCatModal" class="modal-btn cancel flex-1">Batal</button>
+          <button type="submit" class="modal-btn save flex-1">Simpan Kategori</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Local Chart.js (offline) -->
+  <script src="chart.umd.js"></script>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>
